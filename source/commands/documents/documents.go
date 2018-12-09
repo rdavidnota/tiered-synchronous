@@ -1,8 +1,9 @@
-package commands
+package documents
 
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/rdavidnota/tiered-synchronous/source/commands/utils"
 	"github.com/rdavidnota/tiered-synchronous/source/domain"
 	"io"
 	"io/ioutil"
@@ -13,7 +14,7 @@ import (
 func CreatedFile(filename string, file multipart.File) domain.Document {
 	f, err := os.OpenFile(domain.PathFolder+"\\"+filename, os.O_WRONLY|os.O_CREATE, 0666)
 
-	Check(err)
+	utils.Check(err)
 	defer f.Close()
 
 	io.Copy(f, file)
@@ -21,22 +22,29 @@ func CreatedFile(filename string, file multipart.File) domain.Document {
 	return GetFile(CalculateChecksum(filename))
 }
 
+func CreatedFile(filename string, content []byte) domain.Document {
+	file, err := os.OpenFile(domain.PathFolder+"\\"+filename, os.O_WRONLY|os.O_CREATE, 0666)
+	file.Write(content)
+	utils.Check(err)
+	defer file.Close()
+
+	file.Write(content)
+	file.
+
+	return GetFile(CalculateChecksum(filename))
+}
+
+
 func DeleteFile(filename string) {
 	if len(filename) > 0 {
 		err := os.Remove(domain.PathFolder + "\\" + filename)
-		Check(err)
-	}
-}
-
-func Check(e error) {
-	if e != nil {
-		panic(e)
+		utils.Check(err)
 	}
 }
 
 func GetFileById(id string) (*os.File, string) {
 	files, err := ioutil.ReadDir(domain.PathFolder)
-	Check(err)
+	utils.Check(err)
 
 	var doc domain.Document
 
@@ -57,7 +65,7 @@ func GetFileById(id string) (*os.File, string) {
 
 	file, err := os.Open(domain.PathFolder + "\\" + doc.Name)
 
-	Check(err)
+	utils.Check(err)
 
 	return file, file.Name()
 }
@@ -79,7 +87,7 @@ func GetFile(id string) domain.Document {
 func ListFiles() []domain.Document {
 	files, err := ioutil.ReadDir(domain.PathFolder)
 
-	Check(err)
+	utils.Check(err)
 
 	var docs []domain.Document
 
@@ -96,16 +104,18 @@ func CalculateChecksum(filename string) string {
 	var checksum = ""
 	file, err := os.Open(domain.PathFolder + "\\" + filename)
 
-	Check(err)
+	utils.Check(err)
 
 	defer file.Close()
 
 	hash := md5.New()
 	_, err = io.Copy(hash, file)
 
-	Check(err)
+	utils.Check(err)
 
 	checksum = hex.EncodeToString(hash.Sum(nil))
 
 	return checksum
 }
+
+

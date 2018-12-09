@@ -1,10 +1,12 @@
-package controllers
+package documents
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/rdavidnota/tiered-synchronous/source/commands"
+	"github.com/rdavidnota/tiered-synchronous/source/commands/utils"
+	"github.com/rdavidnota/tiered-synchronous/source/commands/documents"
+	"github.com/rdavidnota/tiered-synchronous/source/controllers/auth"
 	"github.com/rdavidnota/tiered-synchronous/source/domain"
 	"io"
 	"log"
@@ -12,21 +14,11 @@ import (
 	"strconv"
 )
 
-func Authorizer(w http.ResponseWriter, r *http.Request) bool {
-	username, password, _ := r.BasicAuth()
-
-	if username != "rnota" || password != "mercado.nota" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return false
-	}
-	return true
-}
-
 func GetDocuments(w http.ResponseWriter, r *http.Request) {
 
-	if Authorizer(w, r) {
+	if auth.Authorizer(w, r) {
 		var docs []domain.Document
-		docs = commands.ListFiles()
+		docs = documents.ListFiles()
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -35,10 +27,10 @@ func GetDocuments(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetDocument(w http.ResponseWriter, r *http.Request) {
-	if Authorizer(w, r) {
+	if auth.Authorizer(w, r) {
 		var doc domain.Document
 		params := mux.Vars(r)
-		doc = commands.GetFile(params["id"])
+		doc = documents.GetFile(params["id"])
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -47,12 +39,12 @@ func GetDocument(w http.ResponseWriter, r *http.Request) {
 }
 
 func DelDocument(w http.ResponseWriter, r *http.Request) {
-	if Authorizer(w, r) {
+	if auth.Authorizer(w, r) {
 		var doc domain.Document
 		params := mux.Vars(r)
-		doc = commands.GetFile(params["id"])
+		doc = documents.GetFile(params["id"])
 
-		commands.DeleteFile(doc.Name)
+		documents.DeleteFile(doc.Name)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -62,16 +54,16 @@ func DelDocument(w http.ResponseWriter, r *http.Request) {
 
 func CreatedDocument(w http.ResponseWriter, r *http.Request) {
 
-	if Authorizer(w, r) {
+	if auth.Authorizer(w, r) {
 		var filename = r.URL.Query().Get("name")
 		fmt.Println(filename)
 		file, _, err := r.FormFile("document")
 
-		commands.Check(err)
+		utils.Check(err)
 
 		defer file.Close()
 
-		var doc = commands.CreatedFile(filename, file)
+		var doc = documents.CreatedFile(filename, file)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
@@ -80,10 +72,10 @@ func CreatedDocument(w http.ResponseWriter, r *http.Request) {
 }
 
 func DownloadDocument(w http.ResponseWriter, r *http.Request) {
-	if Authorizer(w, r) {
+	if auth.Authorizer(w, r) {
 		params := mux.Vars(r)
 
-		file, filename := commands.GetFileById(params["id"])
+		file, filename := documents.GetFileById(params["id"])
 
 		log.Println(filename)
 
@@ -91,9 +83,9 @@ func DownloadDocument(w http.ResponseWriter, r *http.Request) {
 		file.Read(fileHeader)
 		fileContentType := http.DetectContentType(fileHeader)
 
-		fileStat,err := file.Stat()
+		fileStat, err := file.Stat()
 
-		commands.Check(err)
+		utils.Check(err)
 
 		fileSize := strconv.FormatInt(fileStat.Size(), 10)
 

@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func CreatedFile(filename string, file multipart.File) domain.Document {
+func CreatedFileFromFile(filename string, file multipart.File) domain.Document {
 	f, err := os.OpenFile(domain.PathFolder+"\\"+filename, os.O_WRONLY|os.O_CREATE, 0666)
 
 	utils.Check(err)
@@ -22,14 +22,14 @@ func CreatedFile(filename string, file multipart.File) domain.Document {
 	return GetFile(CalculateChecksum(filename))
 }
 
-func CreatedFile(filename string, content []byte) domain.Document {
+func CreatedFileFromBytes(filename string, content []byte) domain.Document {
 	file, err := os.OpenFile(domain.PathFolder+"\\"+filename, os.O_WRONLY|os.O_CREATE, 0666)
-	file.Write(content)
 	utils.Check(err)
+
 	defer file.Close()
 
 	file.Write(content)
-	file.
+	file.Sync()
 
 	return GetFile(CalculateChecksum(filename))
 }

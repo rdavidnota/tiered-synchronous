@@ -45,3 +45,10 @@ type RequestCreateDocument struct {
 	Name string
 	Content []byte
 }
+
+type RequestSendMail struct {
+	Base RequestBase
+	From string
+	To []string
+	Message string
+}

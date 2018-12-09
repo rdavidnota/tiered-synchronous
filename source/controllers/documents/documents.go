@@ -63,7 +63,7 @@ func CreatedDocument(w http.ResponseWriter, r *http.Request) {
 
 		defer file.Close()
 
-		var doc = documents.CreatedFile(filename, file)
+		var doc = documents.CreatedFileFromFile(filename, file)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)

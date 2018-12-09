@@ -6,15 +6,15 @@ import (
 	"strings"
 )
 
-func SendMail(from string, to []string, msg string) {
+func SendMail(from string, to []string, message string) {
 
-	msg = "From: " + from + "\n" +
+	message = "From: " + from + "\n" +
 		"To: " + strings.Join(to, ",") + "\n" +
-		"Subject: " + mailConfig["subject"] + "\n\n" + msg
+		"Subject: " + mailConfig["subject"] + "\n\n" + message
 
 	err := smtp.SendMail(mailConfig["host"]+":"+mailConfig["port"],
 		smtp.PlainAuth("", mailConfig["username"], mailConfig["password"], mailConfig["host"]),
-		mailConfig["username"], to, []byte(msg))
+		mailConfig["username"], to, []byte(message))
 
 	if err != nil {
 		log.Printf("smtp error: %s", err)

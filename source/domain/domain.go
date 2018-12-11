@@ -6,7 +6,7 @@ type Document struct {
 	Size int64
 }
 
-const PathFolder = "C:\\Users\\UTI01\\Downloads\\Programs"
+const PathFolder = "C:\\Users\\core persephone\\Pictures"
 
 type Result struct {
 	Code int

@@ -34,7 +34,6 @@ func CreatedFileFromBytes(filename string, content []byte) domain.Document {
 	return GetFile(CalculateChecksum(filename))
 }
 
-
 func DeleteFile(filename string) {
 	if len(filename) > 0 {
 		err := os.Remove(domain.PathFolder + "\\" + filename)

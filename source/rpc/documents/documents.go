@@ -2,6 +2,7 @@ package documents
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/rdavidnota/tiered-synchronous/source/commands/documents"
 	"github.com/rdavidnota/tiered-synchronous/source/commands/utils"
 	"github.com/rdavidnota/tiered-synchronous/source/domain"
@@ -16,17 +17,18 @@ func FailOnError(err error, msg string) {
 
 
 func Analyze(request []byte) domain.Result {
-	message := domain.RequestBase{Action: ""}
+	fmt.Println(string(request))
+	message := domain.RequestListDocument{}
 	err := json.Unmarshal(request, &message)
 	utils.Check(err)
-
-	if message.Action == "create" {
+	fmt.Println(message.Base.Action)
+	if message.Base.Action == "create" {
 		return create(request)
-	} else if message.Action == "remove" {
+	} else if message.Base.Action == "remove" {
 		return remove(request)
-	} else if message.Action == "get" {
+	} else if message.Base.Action == "get" {
 		return get(request)
-	} else if message.Action == "list" {
+	} else if message.Base.Action == "list" {
 		return list()
 	} else {
 		return domain.Result{

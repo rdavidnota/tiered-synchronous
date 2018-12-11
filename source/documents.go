@@ -50,9 +50,11 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-
+			fmt.Println(string(d.Body))
 			result := documents.Analyze(d.Body)
 			response, _ := json.Marshal(result)
+
+			fmt.Println(string(response))
 			fmt.Println(d.ReplyTo)
 			fmt.Println(d.CorrelationId)
 

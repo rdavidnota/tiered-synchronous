@@ -16,11 +16,11 @@ func FailOnError(err error, msg string) {
 
 
 func Analyze(request []byte) domain.Result {
-	message := domain.RequestBase{Action: ""}
+	message := domain.RequestSendMail{}
 	err := json.Unmarshal(request, &message)
 	utils.Check(err)
 
-	if message.Action == "send" {
+	if message.Base.Action == "send" {
 		return sendMail(request)
 	} else {
 		return domain.Result{
